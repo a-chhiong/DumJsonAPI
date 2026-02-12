@@ -138,7 +138,7 @@ public class JwtAuthService : IJwtAuthService, IDisposable
         if (string.IsNullOrEmpty(token)) 
             return new JwtAuthResult<DPoPData> { IsSuccess = false, Error = JwtError.InvalidToken };
 
-        var method = request.Method;
+        var expectedMethod = request.Method;
         var expectedUrl = $"{_baseUrl}{request.Path.Value}";
 
         try
@@ -161,7 +161,7 @@ public class JwtAuthService : IJwtAuthService, IDisposable
 
             var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             
-            if (!string.Equals(payload.htm, method, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(payload.htm, expectedMethod, StringComparison.OrdinalIgnoreCase))
                 return new JwtAuthResult<DPoPData> { IsSuccess = false, Error = JwtError.InvalidHtm };
 
             if (!string.Equals(payload.htu, expectedUrl, StringComparison.OrdinalIgnoreCase))
