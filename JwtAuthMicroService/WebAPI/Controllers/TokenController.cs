@@ -34,7 +34,7 @@ public class TokenController: BaseController
     [Consumes("application/json")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var result = await _service.Login(Request, request.Email, request.Password);
+        var result = await _service.Login(Request, request.Username, request.Password);
         
         return Ok(result);
     }
