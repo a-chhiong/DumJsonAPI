@@ -40,41 +40,24 @@
 
     <Target Name="InjectVersionInfo" BeforeTargets="BeforeBuild">
         <!-- Try to get Git SHA -->
-        <Exec Command="git log -1 --pretty=format:%H > $(ProjectDir)versioncode.txt"
+        <Exec Command="git log -1 --pretty=format:%H > $(OutDir)version.info"
               WorkingDirectory="$(SolutionDir)"
               IgnoreExitCode="true"
               ContinueOnError="true" />
         
         <!-- Read file if it exists -->
-        <ReadLinesFromFile File="$(ProjectDir)versioncode.txt">
-            <Output TaskParameter="Lines" PropertyName="VersionCode" />
+        <ReadLinesFromFile File="$(OutDir)version.info">
+            <Output TaskParameter="Lines" PropertyName="VersionInfo" />
         </ReadLinesFromFile>
         
-        <!-- Fallback: write timestamp into versioncode.txt if VersionCode is empty -->
+        <!-- Fallback: write timestamp into version.info if VersionInfo is empty -->
         <PropertyGroup>
             <UnixTimestamp>$([System.DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds())</UnixTimestamp>
         </PropertyGroup>
         <WriteLinesToFile
-                Condition="'$(VersionCode)' == ''"
-                File="$(ProjectDir)versioncode.txt"
+                Condition="'$(VersionInfo)' == ''"
+                File="$(OutDir)version.info"
                 Lines="$(UnixTimestamp)"
-                Overwrite="true" />
-
-        <!-- Now VersionCode will always have a value -->
-        <ReadLinesFromFile File="$(ProjectDir)versioncode.txt">
-            <Output TaskParameter="Lines" PropertyName="VersionCode" />
-        </ReadLinesFromFile>
-
-        <ItemGroup>
-            <VersionInfoClassLines Include="namespace WebAPI%3B" />
-            <VersionInfoClassLines Include="public static class VersionInfo" />
-            <VersionInfoClassLines Include="{" />
-            <VersionInfoClassLines Include='%20%20%20%20public const string CODE = "$(VersionCode)"%3B' />
-            <VersionInfoClassLines Include="}" />
-        </ItemGroup>
-        <WriteLinesToFile
-                File="$(ProjectDir)VersionInfo.cs"
-                Lines="@(VersionInfoClassLines)"
                 Overwrite="true" />
     </Target>
 

@@ -13,14 +13,14 @@ namespace WebAPI.Swagger;
 /// Swagger 打造工廠
 /// </summary>
 public static class SwaggerFactory
-{       
+{
     /// <summary>
     /// SwaggerGen
     /// </summary>
     /// <param name="options"></param>
-    public static void Config(SwaggerGenOptions options)
+    /// <param name="versionInfo"></param>
+    public static void Config(SwaggerGenOptions options, string versionInfo)
     {
-        var version = VersionInfo.CODE.SafeFirst(7);
         var descriptionFilePath = Path.Combine(AppContext.BaseDirectory, "Swagger/docs", "Description.md");
         var descriptionText = File.Exists(descriptionFilePath) 
             ? File.ReadAllText(descriptionFilePath) 
@@ -28,7 +28,7 @@ public static class SwaggerFactory
         options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
         {
             Title = "Side Project",
-            Version = version,
+            Version = versionInfo.SafeFirst(7),
             Description = descriptionText,
             Contact = new OpenApiContact
             {

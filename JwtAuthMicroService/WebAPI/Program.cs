@@ -15,6 +15,23 @@ using ZiggyCreatures.Caching.Fusion.Serialization.SystemTextJson;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Load version.info written by MSBuild target
+var versionInfo = "unknown";
+try
+{
+    var path = Path.Combine(AppContext.BaseDirectory, "version.info");
+    if (File.Exists(path))
+    {
+        versionInfo = File.ReadAllText(path).Trim();
+    }
+}
+catch (Exception ex)
+{
+    versionInfo = $"error: {ex.Message}";
+}
+// Make it available via configuration as well singleton
+builder.Configuration["VersionInfo"] = versionInfo;
+
 // CorsPolicy
 var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins")
     .Get<string[]>()?.Select(o => o.Trim().TrimEnd('/')).ToArray() ?? [];   // Clean the origins (remove trailing slashes and whitespace)
@@ -99,7 +116,7 @@ builder.Services.AddControllers(options =>
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(SwaggerFactory.Config);
+builder.Services.AddSwaggerGen(x => SwaggerFactory.Config(x, versionInfo));
 
 // Register Adapter (DI resolves correct generic interface)
 builder.Services.AddSingleton<IJsonMapper, JsonMapper>();

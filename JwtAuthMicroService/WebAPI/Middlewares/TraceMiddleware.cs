@@ -7,18 +7,24 @@ namespace WebAPI.Middlewares;
 public class TraceMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly IConfiguration _configuration;
 
-    public TraceMiddleware(RequestDelegate next) => _next = next;
+    public TraceMiddleware(RequestDelegate next, IConfiguration configuration)
+    {
+        _next = next;
+        _configuration = configuration;
+    }
 
     public async Task InvokeAsync(HttpContext context)
     {
         var traceId = context.Request.Headers[HttpHeaders.TRACE_ID].FirstOrDefault()
                       ?? Guid.NewGuid().ToString();
+        var versionInfo = _configuration["VersionInfo"] ?? "unknown";
         
         TraceContextHolder.CurrentTraceId.Value = traceId;
         
         context.Response.Headers[HttpHeaders.TRACE_ID] = traceId;
-        context.Response.Headers[HttpHeaders.VERSION_CODE] = VersionInfo.CODE.SafeFirst(7);
+        context.Response.Headers[HttpHeaders.VERSION_CODE] = versionInfo.SafeFirst(7);
         await _next(context);
     }
 }
