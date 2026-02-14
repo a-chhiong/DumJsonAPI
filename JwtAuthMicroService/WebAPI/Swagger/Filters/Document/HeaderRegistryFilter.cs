@@ -11,8 +11,8 @@ public class HeaderRegistryFilter : IOperationFilter
     /// </summary>
     private static readonly string[] IncludedHeaders =
     [
-        HttpHeaders.DPoP,
-        HttpHeaders.TRACE_ID,
+        CustomHeaderNames.DPoP,
+        CustomHeaderNames.TRACE_ID,
     ];
 
     public void Apply(OpenApiOperation operation, OperationFilterContext context)

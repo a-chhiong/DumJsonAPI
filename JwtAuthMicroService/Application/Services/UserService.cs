@@ -1,5 +1,6 @@
 using Application.Interfaces;
 using CrossCutting.Extensions;
+using JoshAuthorization.Extensions;
 using JoshAuthorization.Models;
 using JoshAuthorization.Objects;
 using JoshFileCache;
@@ -23,8 +24,8 @@ public class UserService: IUserService
     
     public async Task<object> GetMyself(HttpContext context)
     {        
-        var meta = context.GetItem<TokenPayload>()?.meta;
-        int.TryParse(meta?.Id, out var userId);
+        var sub = context.GetItem<TokenPayload>()?.sub;
+        int.TryParse(sub, out var userId);
         var result = await _dummy.GetUser(userId);
         return result;
     }

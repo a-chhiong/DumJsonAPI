@@ -1,5 +1,6 @@
 using Application.Interfaces;
 using CrossCutting.Extensions;
+using JoshAuthorization.Extensions;
 using JoshAuthorization.Models;
 using JoshAuthorization.Objects;
 using JoshFileCache;
@@ -33,16 +34,20 @@ public class PostService: IPostService
     
     public async Task<object> SearchPosts(HttpContext context, string keywords)
     {
-        var meta = context.GetItem<TokenPayload>()?.meta;
-        int.TryParse(meta?.Id, out var userId);
+        var sub = context.GetItem<TokenPayload>()?.sub;
+        int.TryParse(sub, out var userId);
+        if (string.IsNullOrEmpty(sub))
+        {
+            throw new BadHttpRequestException("UserID Not Found");
+        }
         var result = await _dummy.FetchPosts(keywords);
         return result.posts.Where(p => p.userId == userId).ToList();
     }
 
     public async Task<object> AddPost(HttpContext context, string title, string body)
     {
-        var meta = context.GetItem<TokenPayload>()?.meta;
-        int.TryParse(meta?.Id, out var userId);
+        var sub = context.GetItem<TokenPayload>()?.sub;
+        int.TryParse(sub, out var userId);
         var result = await _dummy.AddPost(userId, title, body);
         return result;
     }

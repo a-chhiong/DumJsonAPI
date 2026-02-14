@@ -4,6 +4,6 @@ namespace JoshAuthorization.Objects;
 
 public class DPoPData : IJwtResultData
 {
-    public DPoPPayload?  Payload { get; init; }
-    public JwkObject? Jwk { get; init; }
+    public required JwkObject Jwk { get; init; }
+    public required DPoPPayload DPoP { get; init; }
 }

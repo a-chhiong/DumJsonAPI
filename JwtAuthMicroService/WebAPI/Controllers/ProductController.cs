@@ -24,7 +24,6 @@ public class ProductController: BaseController
     /// Fetch Any product by ID
     /// </summary>
     [HttpGet("{id}")]
-    [Consumes("application/json")]
     public async Task<IActionResult> Get([FromRoute] int id)
     {
         var result = await _service.GetProduct(HttpContext, id);

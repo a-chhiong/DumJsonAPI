@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using JoshAuthorization.Extensions;
 using JoshAuthorization.Models;
 using JoshAuthorization.Objects;
 using Microsoft.AspNetCore.Http;
@@ -7,13 +8,19 @@ using Microsoft.Extensions.Options;
 
 namespace JoshAuthorization;
 
-public class JwtAuthService : IJwtAuthService, IDisposable
+public class JwtAuthService : IJwtAuthService
 {
     private readonly string _baseUrl;
     private readonly string _issuer;
     private readonly string _audience;
-    private readonly RSA _publicRsa;
-    private readonly RSA _privateRsa;
+    private readonly ECDsa _privateKey;
+    private readonly ECDsa _publicKey;
+    private readonly long _accessExpiryInSeconds;
+    private readonly long _refreshExpiryInSeconds;
+    private readonly long _refreshNotBeforeInSeconds;
+    private readonly long _clockSkewInSeconds;
+
+    #region Private Helpers
 
     public JwtAuthService(
         IOptions<JwtAuthEnvironmentOption> options)
@@ -21,71 +28,57 @@ public class JwtAuthService : IJwtAuthService, IDisposable
         _baseUrl = options.Value.BaseUrl.TrimEnd('/');
         _issuer = options.Value.Issuer;
         _audience = options.Value.Audience;
-        
-        // Get the folder where the DLLs are running
-        var baseDir = AppContext.BaseDirectory;
-
-        // Combine with the paths from config (e.g., "RsaKey/PublicKey.pem")
-        var publicPath = Path.Combine(baseDir, options.Value.PublicKey);
-        var privatePath = Path.Combine(baseDir, options.Value.PrivateKey);
-        
-        // Validate existence before attempting to read (The "Fail Fast" principle)
-        if (!File.Exists(publicPath)) throw new FileNotFoundException($"Public key not found at {publicPath}");
-        if (!File.Exists(privatePath)) throw new FileNotFoundException($"Private key not found at {privatePath}");
-
-        _publicRsa = RSA.Create();
-        _publicRsa.ImportFromPem(File.ReadAllText(publicPath));
-
-        _privateRsa = RSA.Create();
-        _privateRsa.ImportFromPem(File.ReadAllText(privatePath));
+        _privateKey =  options.Value.PrivateKey.ToPrivateKeyFromHex();
+        _publicKey = options.Value.PublicKey.ToPublicKeyFromHex();
+        _accessExpiryInSeconds = options.Value.AccessExpiryInSeconds;
+        _refreshExpiryInSeconds = options.Value.RefreshExpiryInSeconds;
+        _refreshNotBeforeInSeconds = options.Value.RefreshNotBeforeInSeconds;
+        _clockSkewInSeconds = options.Value.ClockSkewInSeconds;
     }
-
-    #region Private Helpers
 
     private string CreateJti()
     {
         // Using Base64Url to keep the JTI header-friendly
-        var input = $"{_issuer}|{Guid.NewGuid():N}|{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+        var input = $"{_issuer}|{_audience}|{Guid.NewGuid():N}|{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
         var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(input));
         return Jose.Base64Url.Encode(hashBytes);
     }
 
     #endregion
 
-    public JwtWrapper Create(JwtMetadata metadata, JwkObject? clientJwk = null)
+    public JwtWrapper Create(string? subject, object? custom, JwkObject? clientJwk = null)
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         var jti = CreateJti();
 
         var payloadAccess = new TokenPayload
         {
+            jti = jti,
             iss = _issuer,
             aud = _audience,
-            sub = metadata.Id,
+            exp = now + _accessExpiryInSeconds,
             iat = now,
-            exp = now + JwtAuthConstant.ACCESS_EXPIRY_IN_SECONDS,
-            jti = jti,
+            sub = subject,
+            custom = custom,
             cnf = CnfObject.From(clientJwk),
-            meta = metadata
         };
 
         var payloadRefresh = new TokenPayload
         {
+            jti = jti,
             iss = _issuer,
             aud = _audience,
-            sub = metadata.Id,
+            exp = now + _refreshExpiryInSeconds,
             iat = now,
-            exp = now + JwtAuthConstant.REFRESH_EXPIRY_IN_SECONDS,
-            nbf = now + JwtAuthConstant.REFRESH_NOT_BEFORE_IN_SECONDS,
-            jti = jti,
+            nbf = now + _refreshNotBeforeInSeconds,
         };
-
+        
         return new JwtWrapper
         {
             Jti = jti,
             TokenType =  clientJwk == null ? "Bearer" : "DPoP",
-            AccessToken = Jose.JWT.Encode(payloadAccess, _privateRsa, Jose.JwsAlgorithm.RS256),
-            RefreshToken = Jose.JWT.Encode(payloadRefresh, _privateRsa, Jose.JwsAlgorithm.RS256),
+            AccessToken = Jose.JWT.Encode(payloadAccess, _privateKey, Jose.JwsAlgorithm.ES256),
+            RefreshToken = Jose.JWT.Encode(payloadRefresh, _privateKey, Jose.JwsAlgorithm.ES256),
         };
     }
 
@@ -106,26 +99,26 @@ public class JwtAuthService : IJwtAuthService, IDisposable
 
         try
         {
-            var payload = Jose.JWT.Decode<TokenPayload>(token, _publicRsa, Jose.JwsAlgorithm.RS256);
+            var tokenPayload = Jose.JWT.Decode<TokenPayload>(token, _publicKey, Jose.JwsAlgorithm.ES256);
             var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-            if (payload.iss != _issuer) return new JwtAuthResult<TokenData> { IsSuccess = false, Error = JwtError.InvalidIssuer };
-            if (payload.aud != _audience) return new JwtAuthResult<TokenData> { IsSuccess = false, Error = JwtError.InvalidAudience };
+            if (tokenPayload.iss != _issuer) return new JwtAuthResult<TokenData> { IsSuccess = false, Error = JwtError.InvalidIssuer };
+            if (tokenPayload.aud != _audience) return new JwtAuthResult<TokenData> { IsSuccess = false, Error = JwtError.InvalidAudience };
 
             // Expiry logic
-            if (now > payload.exp)
+            if (now > tokenPayload.exp)
                 return new JwtAuthResult<TokenData> { IsSuccess = false, Error = JwtError.ExpiredToken };
 
             // NBF logic
             if (isNotBefore)
             {
-                if (!payload.nbf.HasValue)
+                if (!tokenPayload.nbf.HasValue)
                     return new JwtAuthResult<TokenData> { IsSuccess = false, Error = JwtError.InvalidNBF };
-                if (now < payload.nbf.Value)
+                if (now < tokenPayload.nbf.Value)
                     return new JwtAuthResult<TokenData> { IsSuccess = false, Error = JwtError.UntimelyToken };
             }
 
-            return new JwtAuthResult<TokenData> { IsSuccess = true, Data = new TokenData { Payload = payload } };
+            return new JwtAuthResult<TokenData> { IsSuccess = true, Data = new TokenData { Token = tokenPayload } };
         }
         catch
         {
@@ -157,21 +150,21 @@ public class JwtAuthService : IJwtAuthService, IDisposable
             }
             if (jwkObj == null) return new JwtAuthResult<DPoPData> { IsSuccess = false, Error = JwtError.InvalidToken };
             
-            var payload = Jose.JWT.Decode<DPoPPayload>(token, jwkObj.ToECDsa(), Jose.JwsAlgorithm.ES256);
+            var dpopPayload = Jose.JWT.Decode<DPoPPayload>(token, jwkObj.ToECDsa(), Jose.JwsAlgorithm.ES256);
 
             var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             
-            if (!string.Equals(payload.htm, expectedMethod, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(dpopPayload.htm, expectedMethod, StringComparison.OrdinalIgnoreCase))
                 return new JwtAuthResult<DPoPData> { IsSuccess = false, Error = JwtError.InvalidHtm };
 
-            if (!string.Equals(payload.htu, expectedUrl, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(dpopPayload.htu, expectedUrl, StringComparison.OrdinalIgnoreCase))
                 return new JwtAuthResult<DPoPData> { IsSuccess = false, Error = JwtError.InvalidHtu };
 
             // DPoP tokens are usually very short-lived; we check 'iat'
-            if (Math.Abs(now - payload.iat) > JwtAuthConstant.CLOCK_SKEW_IN_SECONDS)
+            if (Math.Abs(now - dpopPayload.iat) > _clockSkewInSeconds)
                 return new JwtAuthResult<DPoPData> { IsSuccess = false, Error = JwtError.UnsyncToken };
 
-            return new JwtAuthResult<DPoPData> { IsSuccess = true, Data = new DPoPData { Payload = payload, Jwk = jwkObj } };
+            return new JwtAuthResult<DPoPData> { IsSuccess = true, Data = new DPoPData { Jwk = jwkObj, DPoP = dpopPayload } };
         }
         catch
         {
@@ -194,10 +187,11 @@ public class JwtAuthService : IJwtAuthService, IDisposable
         var dpopResult = await this.ValidateDPoP(dpop, request);
         if (!dpopResult.IsSuccess) 
             return new JwtAuthResult<AccessData> { IsSuccess = false, Error = dpopResult.Error };
+        var jwk = dpopResult.Data?.Jwk;
     
         // 3. PERFORM THE ATH CHECK (Access Token Hash)
         // RFC 9449: ath = base64url(sha256(ASCII(access_token)))
-        var dpopPayload = dpopResult.Data?.Payload;
+        var dpopPayload = dpopResult.Data?.DPoP;
         var hashBytes = SHA256.HashData(Encoding.ASCII.GetBytes(token));
         var expectedAth = Jose.Base64Url.Encode(hashBytes);
         if (string.IsNullOrEmpty(dpopPayload?.ath) || !string.Equals(dpopPayload?.ath, expectedAth))
@@ -206,7 +200,7 @@ public class JwtAuthService : IJwtAuthService, IDisposable
         }
 
         // 4. Perform the Binding Check (Sender Constraining)
-        var tokenPayload = accessResult.Data?.Payload;
+        var tokenPayload = accessResult.Data?.Token;
         var boundJkt = tokenPayload?.cnf?.jkt;
         var calculatedJkt = CnfObject.From(dpopResult.Data?.Jwk)?.jkt;
         // We need the JWK from the DPoP Header to check against the Refresh Token's CNF
@@ -216,12 +210,6 @@ public class JwtAuthService : IJwtAuthService, IDisposable
             return new JwtAuthResult<AccessData> { IsSuccess = false, Error = JwtError.InvalidBinding };
 
         // If everything passes, return the Normal Token payload
-        return new JwtAuthResult<AccessData> { IsSuccess = true , Data = new AccessData { Payload = tokenPayload, DPoPJti = dpopPayload?.jti } };
-    }
-
-    public void Dispose()
-    {
-        _publicRsa.Dispose();
-        _privateRsa.Dispose();
+        return new JwtAuthResult<AccessData> { IsSuccess = true , Data = new AccessData { Jwk = jwk!, DPoP = dpopPayload!, Token = tokenPayload!} };
     }
 }

@@ -24,7 +24,6 @@ public class UserController: BaseController
     /// Fetch Myself
     /// </summary>
     [HttpGet()]
-    [Consumes("application/json")]
     public async Task<IActionResult> GetMyself()
     {
         var result = await _service.GetMyself(HttpContext);

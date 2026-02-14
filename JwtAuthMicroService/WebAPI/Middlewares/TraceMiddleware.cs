@@ -17,14 +17,14 @@ public class TraceMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        var traceId = context.Request.Headers[HttpHeaders.TRACE_ID].FirstOrDefault()
+        var traceId = context.Request.Headers[CustomHeaderNames.TRACE_ID].FirstOrDefault()
                       ?? Guid.NewGuid().ToString();
         var versionInfo = _configuration["VersionInfo"] ?? "unknown";
         
         TraceContextHolder.CurrentTraceId.Value = traceId;
         
-        context.Response.Headers[HttpHeaders.TRACE_ID] = traceId;
-        context.Response.Headers[HttpHeaders.VERSION_CODE] = versionInfo.SafeFirst(7);
+        context.Response.Headers[CustomHeaderNames.TRACE_ID] = traceId;
+        context.Response.Headers[CustomHeaderNames.VERSION_CODE] = versionInfo.SafeFirst(7);
         await _next(context);
     }
 }

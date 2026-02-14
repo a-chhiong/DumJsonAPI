@@ -4,6 +4,7 @@ using JoshAuthorization.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.ViewModels.Logout;
 using LoginRequest = WebAPI.ViewModels.Login.LoginRequest;
 
 namespace WebAPI.Controllers;
@@ -11,6 +12,7 @@ namespace WebAPI.Controllers;
 /// <summary>
 /// 提供登入/登出/重新驗證機制
 /// </summary>
+[AllowAnonymous]
 public class TokenController: BaseController
 {
     private readonly IHostEnvironment _environment;
@@ -29,12 +31,10 @@ public class TokenController: BaseController
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPost("Auth")]
-    [Consumes("application/json")]
-    [AllowAnonymous]
+    [HttpPost("Login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var result = await _service.Login(Request, request.Username, request.Password);
+        var result = await _service.Login(request.Username, request.Password);
         
         return Ok(result);
     }
@@ -45,11 +45,9 @@ public class TokenController: BaseController
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpPut("Refresh")]
-    [Consumes("application/json")]
-    [AllowAnonymous]
     public async Task<IActionResult> Refresh([FromBody] RefreshRequest request)
     {
-        var result = await _service.Refresh(Request, request.RefreshToken);
+        var result = await _service.Refresh(request.RefreshToken);
         
         return Ok(result);
     }
@@ -58,10 +56,10 @@ public class TokenController: BaseController
     /// 登出
     /// </summary>
     /// <returns></returns>
-    [HttpDelete("")]
-    public async Task<IActionResult> Logout()
+    [HttpPost("Logout")]
+    public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
     {
-        var result = await _service.Logout(HttpContext);
+        var result = await _service.Logout(request.RefreshToken);
         
         return Ok(result);
     }

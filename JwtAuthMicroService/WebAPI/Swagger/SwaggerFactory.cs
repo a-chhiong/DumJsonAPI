@@ -1,5 +1,5 @@
-using CrossCutting.Constants;
 using CrossCutting.Extensions;
+using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
@@ -57,9 +57,9 @@ public static class SwaggerFactory
         
         // options.UseInlineDefinitionsForEnums();
         
-        options.AddSecurityDefinition(SwaggerConstant.AuthName.BEARER, new OpenApiSecurityScheme
+        options.AddSecurityDefinition(HeaderNames.Authorization, new OpenApiSecurityScheme
         {
-            Name = HttpHeaders.Authorization,
+            Name = HeaderNames.Authorization,
             In = ParameterLocation.Header,
             Description = "Access/DPoP Token. Enter: 'Bearer {token}' or 'DPoP {token}'"
         });

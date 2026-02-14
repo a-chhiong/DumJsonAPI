@@ -1,5 +1,6 @@
 using CrossCutting.Constants;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -42,7 +43,7 @@ public class AuthHeaderFilter : IOperationFilter
                     Reference = new OpenApiReference
                     {
                         Type = ReferenceType.SecurityScheme, 
-                        Id = SwaggerConstant.AuthName.BEARER
+                        Id = HeaderNames.Authorization
                     } 
                 }
             ] = Array.Empty<string>(),

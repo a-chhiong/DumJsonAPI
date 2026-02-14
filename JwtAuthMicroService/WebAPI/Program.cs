@@ -140,7 +140,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 }
 
 app.UseHttpsRedirection();
-app.UseMiddleware<JwtAuthMiddleware>();
+app.UseMiddleware<AuthMiddleware>();
 app.UseMiddleware<TraceMiddleware>(); 
 
 app.MapControllers();

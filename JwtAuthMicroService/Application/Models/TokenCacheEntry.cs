@@ -5,9 +5,9 @@ namespace Application.Models;
 
 public class TokenCacheEntry
 {
-    public string jti { get; init; }
-    public string token_type { get; init; }
-    public string refresh_token { get; init; }
-    public JwkObject? jwk { get; init; }
-    public JwtMetadata? meta { get; init; }
+    public string TokenType { get; init; }
+    public string RefreshToken { get; init; }
+    public JwkObject? Jwk { get; init; }
+    public string? Subject { get; init; }
+    public object? Custom { get; init; }
 }

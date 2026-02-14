@@ -1,4 +1,4 @@
-namespace JoshAuthorization;
+namespace JoshAuthorization.Enums;
 
 public enum JwtAuthScheme
 {

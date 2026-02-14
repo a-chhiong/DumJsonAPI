@@ -7,22 +7,22 @@ public class DPoPPayload: IJwtPayload
     /// <summary>
     /// JWT ID
     /// </summary>
-    public string jti { get; init; }
+    public required string jti { get; init; }
 
     /// <summary>
     /// HTTP Method (GET, POST, etc)
     /// </summary>
-    public string htm { get; init; } 
+    public required string htm { get; init; } 
     
     /// <summary>
     /// HTTP URL (without query strings)
     /// </summary>
-    public string htu { get; init; } 
+    public required string htu { get; init; } 
     
     /// <summary>
     /// Issued Time
     /// </summary>
-    public long iat { get; init; }
+    public required long iat { get; init; }
 
     /// <summary>
     /// Access Token Hash.

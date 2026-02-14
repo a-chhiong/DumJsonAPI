@@ -24,7 +24,6 @@ public class PostController: BaseController
     /// Fetch Any post by ID
     /// </summary>
     [HttpGet("{id}")]
-    [Consumes("application/json")]
     public async Task<IActionResult> Get([FromRoute] int id)
     {
         var result = await _service.GetPost(HttpContext, id);
@@ -36,7 +35,6 @@ public class PostController: BaseController
     /// Fetch User's own post
     /// </summary>
     [HttpGet]
-    [Consumes("application/json")]
     public async Task<IActionResult> Search([FromQuery] string keyword)
     {
         var result = await _service.SearchPosts(HttpContext, keyword);
@@ -50,7 +48,6 @@ public class PostController: BaseController
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost()]
-    [Consumes("application/json")]
     public async Task<IActionResult> Add([FromBody] PostRequest request)
     {
         var result = await _service.AddPost(HttpContext, request.Title, request.Body);
@@ -65,7 +62,6 @@ public class PostController: BaseController
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpPut("{id}")]
-    [Consumes("application/json")]
     public async Task<IActionResult> Update(
         [FromRoute] int id,
         [FromBody] PostRequest request)
@@ -81,7 +77,6 @@ public class PostController: BaseController
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpDelete("{id}")]
-    [Consumes("application/json")]
     public async Task<IActionResult> Delete([FromRoute] int id)
     {
         var result = await _service.DeletePost(id);

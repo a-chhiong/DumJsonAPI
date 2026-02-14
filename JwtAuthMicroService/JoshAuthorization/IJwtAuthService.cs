@@ -10,7 +10,7 @@ public interface IJwtAuthService
     /// Generates a pair of Access and Refresh tokens. 
     /// If clientJwk is provided, the Access Token will be DPoP-bound (Sender Constrained).
     /// </summary>
-    JwtWrapper Create(JwtMetadata metadata, JwkObject? clientJwk = null);
+    JwtWrapper Create(string? subject, object? custom, JwkObject? clientJwk = null);
 
     /// <summary>
     /// Validates a standard JWT (Access Token).

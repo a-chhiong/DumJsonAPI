@@ -4,5 +4,5 @@ namespace JoshAuthorization.Objects;
 
 public class TokenData : IJwtResultData
 {
-    public TokenPayload? Payload { get; init; }
+    public required TokenPayload Token { get; init; }
 }
