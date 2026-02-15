@@ -43,7 +43,9 @@
     </ItemGroup>
     
     <ItemGroup>
+      <Folder Include="Attributes\" />
       <Folder Include="Properties\PublishProfiles\" />
+      <Folder Include="WebPage\v2\" />
     </ItemGroup>
 
     <Target Name="InjectVersionInfo" BeforeTargets="BeforeBuild">

@@ -1,4 +1,4 @@
-import { Config } from "../constants/Config.js";
+import { Identity } from '../constants/Identity.js';
 
 /**
  * VaultManager.js
@@ -7,10 +7,10 @@ import { Config } from "../constants/Config.js";
 
 class VaultManager {
     constructor() {
-        this._dbName = `${Config.APP_SCHEM}db`;
-        this._keyStore = `${Config.APP_SCHEM}keys`;    // structured-clone CryptoKeys
-        this._storeName = `${Config.APP_SCHEM}vault`;  // encrypted strings
-        this._masterName = `${Config.APP_SCHEM}MASTER`;
+        this._dbName = `${Identity.APP_SCHEM}db`;
+        this._keyStore = `${Identity.APP_SCHEM}keys`;    // structured-clone CryptoKeys
+        this._storeName = `${Identity.APP_SCHEM}vault`;  // encrypted strings
+        this._masterName = `${Identity.APP_SCHEM}MASTER`;
         this._db = null;
         this._masterKey = null;
         this._rotationPromise = null;

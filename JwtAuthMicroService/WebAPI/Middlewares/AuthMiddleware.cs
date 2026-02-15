@@ -34,9 +34,10 @@ public class AuthMiddleware
         
         if (endpoint == null)
         {
-            context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+            throw new BadHttpRequestException("No Available Endpoint", (int)HttpStatusCode.NotFound);
         }
-        else if (isAnonymous)
+        
+        if (isAnonymous)
         {
             // Proceed unless DPoP was provided and was INVALID
             if (await HandleAnonymousDPoP(context))
@@ -68,9 +69,7 @@ public class AuthMiddleware
         
         if (!dpopResult.IsSuccess)
         {
-            context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-            await context.Response.WriteAsync($"DPoP Validation failed: {dpopResult.Error}");
-            return false;
+            throw new BadHttpRequestException($"Auth failed: {dpopResult.Error}", (int)HttpStatusCode.BadRequest);
         }
         
         var jwkObject = dpopResult.Data!.Jwk;
@@ -110,9 +109,7 @@ public class AuthMiddleware
 
         if (!result.IsSuccess)
         {
-            context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-            await context.Response.WriteAsync($"Auth failed: {result.Error}");
-            return false;
+            throw new BadHttpRequestException($"Auth failed: {result.Error}", (int)HttpStatusCode.Unauthorized);
         }
 
         if (scheme == JwtAuthScheme.DPoP && result is JwtAuthResult<AccessData> authResult)
@@ -125,9 +122,7 @@ public class AuthMiddleware
             // DPoP Anti-Replay Attack
             if(true == await _cache.GetOrDefaultAsync<bool?>($"dpop-jti:{jti}"))
             {
-                context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-                await context.Response.WriteAsync($"Auth failed: Replayed DPoP");
-                return false;
+                throw new BadHttpRequestException($"Auth failed: Replayed DPoP", (int)HttpStatusCode.Forbidden);
             }
             await _cache.SetAsync($"dpop-jti:{jti}", true, TimeSpan.FromMinutes(10));
             

@@ -1,3 +1,4 @@
+import { Identity } from "../constants/Identity.js";
 import { Config } from "../constants/Config.js";
 import { stateHub } from '../objects/EventHub.js';
 
@@ -29,19 +30,19 @@ class SessionManager {
     }
 
     _getCurrentTabIndex() {
-        return sessionStorage.getItem(`${Config.APP_SCHEM}${Config.CURRENT_TAB}`);
+        return sessionStorage.getItem(`${Identity.APP_SCHEM}${Config.CURRENT_TAB}`);
     }
 
     _setCurrentTabIndex(idx) {
-        return sessionStorage.setItem(`${Config.APP_SCHEM}${Config.CURRENT_TAB}`, idx);
+        return sessionStorage.setItem(`${Identity.APP_SCHEM}${Config.CURRENT_TAB}`, idx);
     }
 
     _getLastActiveTabIndex() {
-        return localStorage.getItem(`${Config.APP_SCHEM}${Config.LAST_ACTIVE_TAB}`);
+        return localStorage.getItem(`${Identity.APP_SCHEM}${Config.LAST_ACTIVE_TAB}`);
     }
 
     _setLastActiveTabIndex(idx) {
-        return localStorage.setItem(`${Config.APP_SCHEM}${Config.LAST_ACTIVE_TAB}`, idx);
+        return localStorage.setItem(`${Identity.APP_SCHEM}${Config.LAST_ACTIVE_TAB}`, idx);
     }
 
     _calculateInitialIndex() {

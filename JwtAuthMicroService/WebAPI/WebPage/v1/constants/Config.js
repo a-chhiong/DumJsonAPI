@@ -1,6 +1,5 @@
 export const Config = {
     TOKEN_EXPIRY: 1, // minutes
-    APP_SCHEM: "idv.josh.app.DbJ5cTJxGQKLhAhz://",
     SESSION_MAX: 10,
     CURRENT_TAB: "CURRENT_TAB",
     LAST_ACTIVE_TAB: "LAST_ACTIVE_TAB",

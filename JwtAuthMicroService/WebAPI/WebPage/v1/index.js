@@ -130,7 +130,7 @@ async function ClickLogin() {
             username: getUsername(),
             password: getPassword()
         });
-        const { accessToken, refreshToken } = res.data.data;
+        const { accessToken, refreshToken } = res.data;
         await tokenMgr.saveTokens( accessToken, refreshToken);
         console.log(`[Login] Logged in, tokens stored!`);
         showOutput(JSON.stringify(res.data, null, 2));

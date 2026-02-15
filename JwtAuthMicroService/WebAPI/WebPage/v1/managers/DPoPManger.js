@@ -1,4 +1,5 @@
 import { vaultMgr } from './VaultManager.js';
+import { Identity } from '../constants/Identity.js';
 import { Config } from "../constants/Config.js";
 import { stateHub } from '../objects/EventHub.js';
 import { BehaviorSubject, distinctUntilChanged } from 'rxjs';
@@ -55,8 +56,8 @@ class DPoPManager {
 
     async _loadKeys(idx) {
         return await Promise.all([
-            vaultMgr.loadCryptoKey(`${Config.APP_SCHEM}${Config.PRIVATE_KEY}[${idx}]`),
-            vaultMgr.loadCryptoKey(`${Config.APP_SCHEM}${Config.PUBLIC_KEY}[${idx}]`)
+            vaultMgr.loadCryptoKey(`${Identity.APP_SCHEM}${Config.PRIVATE_KEY}[${idx}]`),
+            vaultMgr.loadCryptoKey(`${Identity.APP_SCHEM}${Config.PUBLIC_KEY}[${idx}]`)
         ]);
     }
 
@@ -122,8 +123,8 @@ class DPoPManager {
 
     async _saveKeys(idx, priv, pub) {
         await Promise.all([
-            vaultMgr.saveCryptoKey(`${Config.APP_SCHEM}${Config.PRIVATE_KEY}[${idx}]`, priv),
-            vaultMgr.saveCryptoKey(`${Config.APP_SCHEM}${Config.PUBLIC_KEY}[${idx}]`, pub)
+            vaultMgr.saveCryptoKey(`${Identity.APP_SCHEM}${Config.PRIVATE_KEY}[${idx}]`, priv),
+            vaultMgr.saveCryptoKey(`${Identity.APP_SCHEM}${Config.PUBLIC_KEY}[${idx}]`, pub)
         ]);
     }
 
@@ -160,8 +161,8 @@ class DPoPManager {
 
     async _clearKeys(idx) {
         await Promise.all([
-            vaultMgr.saveCryptoKey(`${Config.APP_SCHEM}${Config.PRIVATE_KEY}[${idx}]`),
-            vaultMgr.saveCryptoKey(`${Config.APP_SCHEM}${Config.PUBLIC_KEY}[${idx}]`)
+            vaultMgr.saveCryptoKey(`${Identity.APP_SCHEM}${Config.PRIVATE_KEY}[${idx}]`),
+            vaultMgr.saveCryptoKey(`${Identity.APP_SCHEM}${Config.PUBLIC_KEY}[${idx}]`)
         ]);
     }
 

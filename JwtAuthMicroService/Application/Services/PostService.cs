@@ -57,7 +57,7 @@ public class PostService: IPostService
         var result = await _dummy.UpdatePost(id, title, body);
         if (string.IsNullOrEmpty(result.title) || string.IsNullOrEmpty(result.body))
         {
-            throw  new ApplicationException("Post Not Found");
+            throw  new BadHttpRequestException("Post Not Found");
         }
         return result;
     }
@@ -67,7 +67,7 @@ public class PostService: IPostService
         var result = await _dummy.DeletePost(id);
         if (string.IsNullOrEmpty(result.title) || string.IsNullOrEmpty(result.body))
         {
-            throw  new ApplicationException("Post Not Found");
+            throw  new BadHttpRequestException("Post Not Found");
         }
         return result;
     }

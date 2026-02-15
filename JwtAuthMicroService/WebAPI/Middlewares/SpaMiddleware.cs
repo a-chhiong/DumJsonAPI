@@ -26,7 +26,7 @@ public class SpaMiddleware
         if (context.Request.Path.StartsWithSegments("/web", StringComparison.OrdinalIgnoreCase))
         {
             var path = context.Request.Path.Value ?? string.Empty;
-            var filePath = Path.Combine(_env.ContentRootPath, "WebPage", path.TrimStart('/'));
+            var filePath = Path.Combine(_env.ContentRootPath, "WebPage", "v1", path.TrimStart('/'));
 
             // If the requested file does not exist, serve index.html
             if (!File.Exists(filePath) && !Directory.Exists(filePath))
@@ -43,6 +43,6 @@ public class SpaMiddleware
     {
         context.Response.ContentType = "text/html";
         await context.Response.SendFileAsync(
-            Path.Combine(_env.ContentRootPath, "WebPage", "index.html"));
+            Path.Combine(_env.ContentRootPath, "WebPage", "v1", "index.html"));
     }
 }

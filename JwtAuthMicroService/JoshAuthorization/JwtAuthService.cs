@@ -85,8 +85,8 @@ public class JwtAuthService : IJwtAuthService
 
     public async Task<JwtAuthResult<TokenData>> Validate(string? token)
     {
-        if (string.IsNullOrEmpty(token)) 
-            return new JwtAuthResult<TokenData> { IsSuccess = false, Error = JwtError.InvalidToken };
+        if (string.IsNullOrEmpty(token) || string.Equals(token, "null", StringComparison.OrdinalIgnoreCase)) 
+            return new JwtAuthResult<TokenData> { IsSuccess = false, Error = JwtError.MissingToken };
         
         try
         {
@@ -120,8 +120,8 @@ public class JwtAuthService : IJwtAuthService
 
     public async Task<JwtAuthResult<DPoPData>> Validate(string? token, HttpRequest request)
     {
-        if (string.IsNullOrEmpty(token)) 
-            return new JwtAuthResult<DPoPData> { IsSuccess = false, Error = JwtError.InvalidToken };
+        if (string.IsNullOrEmpty(token) || string.Equals(token, "null", StringComparison.OrdinalIgnoreCase)) 
+            return new JwtAuthResult<DPoPData> { IsSuccess = false, Error = JwtError.MissingToken };
 
         try
         {
@@ -166,7 +166,10 @@ public class JwtAuthService : IJwtAuthService
     public async Task<JwtAuthResult<AccessData>> Validate(string? token, string? dpop, HttpRequest request)
     {   
         // 0. Mandatory Field for AccessToken and DPoPToken
-        if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(dpop))
+        if (string.IsNullOrEmpty(token) || string.Equals(token, "null", StringComparison.OrdinalIgnoreCase))
+            return new JwtAuthResult<AccessData> { IsSuccess = false, Error = JwtError.MissingToken };
+        
+        if (string.IsNullOrEmpty(dpop) || string.Equals(dpop, "null", StringComparison.OrdinalIgnoreCase))
             return new JwtAuthResult<AccessData> { IsSuccess = false, Error = JwtError.MissingToken };
         
         // 1. Validate the Access Token (The Bearer/DPoP part)

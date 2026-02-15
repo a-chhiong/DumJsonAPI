@@ -105,7 +105,7 @@ class ApiManager {
                     // If a promise already exists, everyone waits for THAT specific promise.
                     if (this._refreshPromise) {
                         return this._refreshPromise.then(async newToken => {
-                            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+                            originalRequest.headers.Authorization = `DPoP ${newToken}`;
                             const htm = originalRequest.method || "GET";
                             const htu = `${this._BASE_URL}${originalRequest.url}`;
                             const dpopProof = await dpopMgr.createDPoP(htm, htu, newToken);
@@ -125,7 +125,7 @@ class ApiManager {
                                 refreshToken: rt,
                             });
                             
-                            const { accessToken, refreshToken } = res.data.data;
+                            const { accessToken, refreshToken } = res.data;
                             await tokenMgr.saveTokens(accessToken, refreshToken);
                             console.log(`[ApiManager] Refreshing token done!`);
 
@@ -142,7 +142,7 @@ class ApiManager {
 
                     // The "First" request also waits for the lock it just created
                     return this._refreshPromise.then(async newToken => {
-                        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+                        originalRequest.headers.Authorization = `DPoP ${newToken}`;
                         const htm = originalRequest.method || "GET";
                         const htu = `${this._BASE_URL}${originalRequest.url}`;
                         const dpopProof = await dpopMgr.createDPoP(htm, htu, newToken);

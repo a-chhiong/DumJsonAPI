@@ -7,7 +7,6 @@ using NeoSmart.Caching.Sqlite;
 using WebAPI.Swagger;
 using NLog.Web;
 using SQLitePCL;
-using WebAPI.Attributes;
 using WebAPI.Formatters;
 using WebAPI.Middlewares;
 using WebAPI.ServiceCollection;
@@ -102,7 +101,6 @@ builder.Host.UseNLog();
 // Add services to the container.
 builder.Services.AddControllers(options =>
 {
-    options.Filters.Add<ApiResponseFilterAttribute>();
     options.InputFormatters.Insert(0, new PlainTextInputFormatter());
     
 }).AddJsonOptions(options =>
@@ -147,6 +145,7 @@ app.UseStaticFiles(new StaticFileOptions
         Path.Combine(builder.Environment.ContentRootPath, "WebPage")),
     RequestPath = "/web"
 });
+app.UseMiddleware<ErrorMiddleware>();
 app.UseMiddleware<TraceMiddleware>(); 
 app.UseMiddleware<SpaMiddleware>();
 app.UseMiddleware<AuthMiddleware>();
