@@ -1,5 +1,6 @@
 import { tokenMgr } from '../managers/TokenManager.js';
 import { vaultMgr } from '../managers/VaultManager.js';
+import { dpopMgr } from '../managers/DPoPManger.js';
 import { apiMgr } from '../managers/ApiManager.js';
 import { sessionMgr } from '../managers/SessionManager.js';
 import { LaunchView } from './views/Launch/LaunchView.js';
@@ -43,18 +44,20 @@ export class App {
 
         await vaultMgr.init();
 
-        apiMgr.init();
-        
         // Assuming sessionMgr exists in your context
         const startIdx = sessionMgr.init(); 
     
         await tokenMgr.init(startIdx); // Passing startIdx if needed
     
+        await dpopMgr.init(startIdx);
+
+        apiMgr.init();
+
         // 2. Subscribe to the Auth stream for routing
         tokenMgr.isAuthenticated$.subscribe(authState => {
             this.handleRouting(authState);
         });
-        
+                
         console.log("App Shell: Started");
     }
 

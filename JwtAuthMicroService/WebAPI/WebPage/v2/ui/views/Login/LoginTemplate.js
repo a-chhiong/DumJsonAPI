@@ -33,12 +33,6 @@ export const LoginTemplate = (state, actions) => {
                         @click=${actions.onLogin}>
                         ${state.isLoading ? 'Authenticating...' : 'Secure Login'}
                     </button>
-                    
-                    <button class="btn-bad" 
-                        ?disabled=${state.isLoading}
-                        @click=${actions.onLoginBad}>
-                        Login (Bad Flow)
-                    </button>
                 </div>
             </div>
         </div>

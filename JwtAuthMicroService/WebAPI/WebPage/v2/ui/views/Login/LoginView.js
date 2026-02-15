@@ -13,7 +13,7 @@ export class LoginView extends BaseView {
     }
 
     // This is the logic internal to the Login screen
-    async performLogin(useRefreshToken = true) {
+    async performLogin() {
         const username = this.container.querySelector('#username').value;
         const password = this.container.querySelector('#password').value;
 
@@ -22,16 +22,15 @@ export class LoginView extends BaseView {
         this.updateView(); // Re-render to show loading state
 
         try {
-            const res = await apiMgr.anonApi.post("/login", {
+            const res = await apiMgr.tokenApi.post("/login", {
                 username,
-                password,
-                expiresInMins: 1 // Keep it short for the demo
+                password
             });
 
             const { accessToken, refreshToken } = res.data;
             
             // Save via the secure TokenManager (which uses VaultManager)
-            await tokenMgr.saveTokens(accessToken, useRefreshToken ? refreshToken : null);
+            await tokenMgr.saveTokens( accessToken, refreshToken);
             
             // Note: We don't need to manually switch views here. 
             // App.js is subscribed to tokenMgr.isAuthenticated$ and will handle it!
@@ -45,8 +44,7 @@ export class LoginView extends BaseView {
 
     template() {
         return LoginTemplate(this.state, {
-            onLogin: () => this.performLogin(true),
-            onLoginBad: () => this.performLogin(false)
+            onLogin: () => this.performLogin(true)
         });
     }
 }

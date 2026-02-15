@@ -16,7 +16,7 @@ export class HomeView extends BaseView {
 
     onMounted() {
         this.showLoader();
-        apiMgr.authApi.get('/auth/me')
+        apiMgr.authApi.get('/user')
             .then(res => {
                 this.state.user = res.data;
                 this.state.remainingTime = this._calcaulate(tokenMgr.getAccessToken());
@@ -67,10 +67,26 @@ export class HomeView extends BaseView {
 
     template() {
         return HomeTemplate(this.state, {
-            onLogout: () => tokenMgr.clearTokens(),
+            onLogout: () => this.handleLogout(),
             onFetchPosts: () => this.handleFetchPosts(),
             onFetchProducts: () => this.handleFetchProducts()
         });
+    }
+
+    async handleLogout() {
+        this.showLoader();
+        try {
+            const rt = tokenMgr.getRefreshToken();
+            const res = await apiMgr.tokenApi.post("/logout", {
+                refreshToken: rt,
+            });
+            console.log(`[Logout] Logged out, tokens to be cleared!`);
+        } catch (err) {
+            console.error("[Logout] Failed", err);
+        } finally {
+            await tokenMgr.clearTokens();
+            this.hideLoader();
+        }
     }
 
     async handleFetchPosts() {
