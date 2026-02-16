@@ -1,5 +1,5 @@
 import { render, html } from 'html';
-import { themeMgr } from '../../managers/ThemeManager.js';
+import { themeHub } from '../../objects/ThemeHub.js';
 
 export class BaseView {
     constructor(container) {
@@ -39,7 +39,7 @@ export class BaseView {
 
     // Fragments don't manage themes, they just provide the UI to trigger them
     toggleTheme() {
-        themeMgr.toggle();
+        themeHub.toggle();
     }
 
     dispose() {

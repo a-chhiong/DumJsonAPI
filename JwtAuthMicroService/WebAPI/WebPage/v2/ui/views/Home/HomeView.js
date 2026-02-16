@@ -2,13 +2,13 @@ import { BaseView } from '../BaseView.js';
 import { HomeTemplate } from './HomeTemplate.js';
 import { apiMgr } from '../../../managers/ApiManager.js';
 import { tokenMgr } from '../../../managers/TokenManager.js';
-import { themeMgr } from '../../../managers/ThemeManager.js';
+import { themeHub } from '../../../objects/ThemeHub.js';
 
 export class HomeView extends BaseView {
     constructor(container) {
         super(container);
         this.state = {
-            theme: themeMgr.current,
+            theme: themeHub.current,
             user: null,
             remainingTime: -1,
             results: []

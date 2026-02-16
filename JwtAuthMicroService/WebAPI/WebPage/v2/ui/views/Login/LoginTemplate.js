@@ -1,9 +1,9 @@
 import { html } from 'html';
-import { ThemeMode } from '../../../constants/ThemeMode.js';
+import { Theme } from '../../../constants/Theme.js';
 
 export const LoginTemplate = (state, actions) => {
   const { theme, username, password, isLoading, error } = state;
-  const isDark = theme === ThemeMode.DARK;
+  const isDark = theme === Theme.DARK;
   const styles = {
     overlay: `
       display: flex;

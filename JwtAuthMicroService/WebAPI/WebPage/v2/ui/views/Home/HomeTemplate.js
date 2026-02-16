@@ -1,9 +1,9 @@
 import { html } from 'html';
-import { ThemeMode } from '../../../constants/ThemeMode.js';
+import { Theme } from '../../../constants/Theme.js';
 
 export const HomeTemplate = (state, actions) => {
   const { theme, user, remainingTime, posts } = state;
-  const isDark = theme === ThemeMode.DARK;
+  const isDark = theme === Theme.DARK;
   
   if (!user) return html`
     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 80vh; gap: 1rem;">

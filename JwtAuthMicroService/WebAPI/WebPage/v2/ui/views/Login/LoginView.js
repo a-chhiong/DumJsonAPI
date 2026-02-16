@@ -2,13 +2,13 @@ import { BaseView } from '../BaseView.js';
 import { LoginTemplate } from './LoginTemplate.js';
 import { apiMgr } from '../../../managers/ApiManager.js';
 import { tokenMgr } from '../../../managers/TokenManager.js';
-import { themeMgr } from '../../../managers/ThemeManager.js';
+import { themeHub } from '../../../objects/ThemeHub.js';
 
 export class LoginView extends BaseView {
   constructor(container) {
     super(container);
     this.state = {
-        theme: themeMgr.current,
+        theme: themeHub.current,
         username: 'charlottem',
         password: 'charlottempass',
         isLoading: false,
