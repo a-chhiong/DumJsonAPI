@@ -1,6 +1,6 @@
 import { vaultManager } from './VaultManager.js';
 import { Identity } from '../constants/Identity.js';
-import { Config } from "../constants/Config.js";
+import { Session } from "../constants/Session.js";
 import { stateHub } from '../helpers/EventHub.js';
 import { BehaviorSubject, distinctUntilChanged, map } from 'rxjs';
 
@@ -32,7 +32,7 @@ class TokenManager {
         this._initPromise = (async () => {
             try {
                 // Hydrate all slots into RAM at boot
-                const indices = Array.from({ length: Config.SESSION_MAX }, (_, i) => i);
+                const indices = Array.from({ length: Session.MAX_COUNT }, (_, i) => i);
                 await Promise.all(indices.map(i => this._hydrate(i)));
 
                 console.debug(`[TokenManager] Initialized at index ${this._currentIdx}`);

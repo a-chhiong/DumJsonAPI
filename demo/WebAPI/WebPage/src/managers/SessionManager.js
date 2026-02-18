@@ -1,5 +1,5 @@
 import { Identity } from "../constants/Identity.js";
-import { Config } from "../constants/Config.js";
+import { Session } from "../constants/Session.js";
 
 class SessionManager {
     constructor() {
@@ -40,7 +40,7 @@ class SessionManager {
      * Forces the session to a specific index (Used for account switching)
      */
     switchToIndex(idx) {
-        if (idx < 0 || idx >= Config.SESSION_MAX) return;
+        if (idx < 0 || idx >= Session.MAX_COUNT) return;
         this._resolve(idx);
         // Force a reload or route change to sync the URL
         window.location.hash = `#/${this.activeId}/home`;
@@ -66,7 +66,7 @@ class SessionManager {
 
     _getRegistry() {
         const raw = localStorage.getItem(`${Identity.APP_SCHEM}_REGISTRY`);
-        return raw ? JSON.parse(raw) : new Array(Config.SESSION_MAX).fill(null);
+        return raw ? JSON.parse(raw) : new Array(Session.MAX_COUNT).fill(null);
     }
 
     _saveRegistry(arr) {
