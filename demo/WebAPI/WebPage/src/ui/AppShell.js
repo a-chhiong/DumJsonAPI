@@ -42,6 +42,7 @@ export class AppShell extends LitElement {
      * The first time the UI is actually ready (Shadow DOM is accessible).
      */
     firstUpdated() {
+        console.debug(`firstUpdated`);
         const outlet = this.shadowRoot.getElementById('outlet');
         this.router = new Router(outlet);
         // Show the splash screen immediately
@@ -78,6 +79,7 @@ export class AppShell extends LitElement {
      * Efficiently watch for Auth changes.
      */
     updated(changedProperties) {
+        console.debug('updated properties:', changedProperties);
         // If the auth hub value changed, check if we need to navigate
         const currentAuth = this.auth.value?.isAuth;
         if (currentAuth !== this._lastAuthState) {

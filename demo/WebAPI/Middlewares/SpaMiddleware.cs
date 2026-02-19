@@ -17,24 +17,23 @@ public class SpaMiddleware
     {
         var path = context.Request.Path.Value ?? "";
         
-        // API Route
+        // 1. If it's an API call, let it go through the normal pipeline
         if (path.StartsWith("/api", StringComparison.OrdinalIgnoreCase))
         {
             await _next(context);
             return;
         }
-        
-        // Only handle requests starting with /web
-        var filePath = Path.Combine(_env.ContentRootPath, "web", path.TrimStart('/'));
-
-        // If the requested file does not exist, serve index.html
-        if (!File.Exists(filePath) && !Directory.Exists(filePath))
+    
+        // 2. If it's a physical file that exists (css, js, images), 
+        // let StaticFileMiddleware handle it.
+        if (Path.HasExtension(path)) 
         {
-            await Redirect(context);
+            await _next(context);
             return;
         }
 
-        await _next(context);
+        // 3. Otherwise, it's a SPA route. Serve index.html and STOP.
+        await Redirect(context);
     }
 
     private async Task Redirect(HttpContext context)

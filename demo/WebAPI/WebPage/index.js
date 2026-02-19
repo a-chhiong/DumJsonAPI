@@ -9,7 +9,7 @@ import { tokenManager } from './src/managers/TokenManager.js';
 import { dpopManager } from './src/managers/DPoPManger.js';
 import { apiManager } from './src/managers/ApiManager.js';
 
-import './src/ui/app-shell.js';
+import './src/ui/AppShell.js';
 
 /**
  * The Bootstrap function acts like Android's 'onCreate' or 'main' method.
@@ -27,7 +27,7 @@ async function bootstrap() {
         // A. INITIALIZE SERVICES
         // 1. Initialize Vault & Session
         await vaultManager.init();
-        const sessionIdx = await sessionManager.init();
+        const sessionIdx = sessionManager.init();
 
         // 2. Initialize Security Layer (DPoP & Tokens)
         // Using Promise.all here just like your v2 code for efficiency

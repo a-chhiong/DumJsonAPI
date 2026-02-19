@@ -141,9 +141,9 @@ app.UseHttpsRedirection();
 // Serve static files
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(builder.Environment.ContentRootPath, "WebPage")),
-    RequestPath = "/web"
+    // having the WebPage as the entrypoint of the WHOLE web app.
+    FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "WebPage")), 
+    RequestPath = ""
 });
 app.UseMiddleware<ErrorMiddleware>();
 app.UseMiddleware<TraceMiddleware>(); 
