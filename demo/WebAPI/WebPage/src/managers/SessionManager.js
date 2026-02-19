@@ -33,8 +33,8 @@ class SessionManager {
 
         this._resolve(targetIdx);
 
-        console.debug(`activeIdx:`, this.activeIdx);
-        console.debug(`activeId:`, this.activeId);
+        console.debug(`[SessionManager] activeIdx:`, this.activeIdx);
+        console.debug(`[SessionManager] activeId:`, this.activeId);
 
         this._isInitialised = true;
     }
@@ -51,7 +51,7 @@ class SessionManager {
     }
 
     _resolve(idx) {
-        console.debug(`resolve, idx:`, idx);
+        console.debug(`[SessionManager] resolve, idx:`, idx);
         const registry = this._getRegistry();
         
         // If slot is empty, generate a new identity for this index

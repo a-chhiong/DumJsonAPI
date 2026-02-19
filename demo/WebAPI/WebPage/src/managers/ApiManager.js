@@ -1,5 +1,5 @@
 import { tokenManager } from './TokenManager.js';
-import { dpopManager } from './DPoPManger.js';
+import { dpopManager } from './DPoManager.js';
 import { stateHub } from '../helpers/EventHub.js';
 import axios from 'axios';
 

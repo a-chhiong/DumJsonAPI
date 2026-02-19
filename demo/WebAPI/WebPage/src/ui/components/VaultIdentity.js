@@ -115,5 +115,3 @@ export class VaultIdentity extends LitElement {
         `;
     }
 }
-
-customElements.define('vault-identity', VaultIdentity);

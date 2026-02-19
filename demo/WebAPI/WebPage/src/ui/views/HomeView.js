@@ -4,13 +4,6 @@ import { themeManager } from '../../managers/ThemeManager.js';
 import { LifecycleHub } from '../../helpers/LifecycleHub.js';
 import { Theme } from '../../constants/Theme.js';
 
-// Import our specialized components
-import '../components/ProfileHeader.js';
-import '../components/VaultIdentity.js';
-import '../components/BiometricCard.js';
-import '../components/FinancialSlots.js';
-import '../components/CryptoAssets.js';
-
 export class HomeView extends LitElement {
     static styles = css`
         :host { display: block; animation: fadeIn 0.4s ease-out; }
@@ -90,4 +83,3 @@ export class HomeView extends LitElement {
         `;
     }
 }
-customElements.define('home-view', HomeView);

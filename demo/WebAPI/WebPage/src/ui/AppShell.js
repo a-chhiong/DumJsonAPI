@@ -4,11 +4,6 @@ import { tokenManager } from '../managers/TokenManager.js';
 import { LifecycleHub } from '../helpers/LifecycleHub.js';
 import { Router } from './Router.js';
 
-// KEPP ALL CHILD VIEW TO IMPORT FOR REFERENCE!
-import './views/LaunchView.js';
-import './views/LoginView.js';
-import './views/HomeView.js';
-
 export class AppShell extends LitElement {
     static styles = css`
         :host { display: block; height: 100vh; width: 100vw; }
@@ -47,7 +42,7 @@ export class AppShell extends LitElement {
      * The first time the UI is actually ready (Shadow DOM is accessible).
      */
     firstUpdated() {
-        console.debug(`firstUpdated`);
+        console.debug(`AppShell: firstUpdated`);
         const outlet = this.shadowRoot.getElementById('outlet');
         this.router = new Router(outlet);
         
@@ -82,7 +77,7 @@ export class AppShell extends LitElement {
      * Efficiently watch for Auth changes.
      */
     updated(changedProperties) {
-        console.debug('updated properties:', changedProperties);
+        console.debug('AppShell: updated:', changedProperties);
         // If the auth hub value changed, check if we need to navigate
         const currentAuth = this.auth.value?.isAuth;
         if (currentAuth !== this._lastAuthState) {
@@ -118,5 +113,3 @@ export class AppShell extends LitElement {
         `;
     }
 }
-
-customElements.define('app-shell', AppShell);

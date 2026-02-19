@@ -52,6 +52,3 @@ export class LaunchView extends LitElement {
         `;
     }
 }
-
-// Register the custom element tag
-customElements.define('launch-view', LaunchView);

@@ -174,5 +174,3 @@ export class FinancialSlots extends LitElement {
         `;
     }
 }
-
-customElements.define('financial-slots', FinancialSlots);

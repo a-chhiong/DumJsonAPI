@@ -129,5 +129,3 @@ export class CryptoAssets extends LitElement {
         `;
     }
 }
-
-customElements.define('crypto-assets', CryptoAssets);

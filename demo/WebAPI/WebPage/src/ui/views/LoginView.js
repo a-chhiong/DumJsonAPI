@@ -207,5 +207,3 @@ export class LoginView extends LitElement {
         `;
     }
 }
-
-customElements.define('login-view', LoginView);

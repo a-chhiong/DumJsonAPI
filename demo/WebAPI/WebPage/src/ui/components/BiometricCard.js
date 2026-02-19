@@ -147,5 +147,3 @@ export class BiometricCard extends LitElement {
         `;
     }
 }
-
-customElements.define('biometric-card', BiometricCard);

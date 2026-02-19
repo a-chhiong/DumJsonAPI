@@ -114,4 +114,3 @@ export class ProfileHeader extends LitElement {
         `;
     }
 }
-customElements.define('profile-header', ProfileHeader);
